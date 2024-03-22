@@ -2,6 +2,7 @@ package com.example;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -18,14 +19,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.TreeSet;
 
 
 /*
@@ -46,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
     private static final long SCAN_PERIOD = 10000; // Scan for 10 seconds
 
     private Button btnTurnOnBluetooth, btnTurnOffBluetooth, btnScanBluetooth;
+    private TextView tvScannedDevics;
 
+    private TreeSet<String> scannedDevices = new TreeSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         btnTurnOnBluetooth = findViewById(R.id.btnTurnOnBluetooth);
         btnTurnOffBluetooth = findViewById(R.id.btnTurnOffBluetooth);
         btnScanBluetooth = findViewById(R.id.btnScanBluetooth);
+        tvScannedDevics = findViewById(R.id.tvScannedDevics);
 
         btnTurnOnBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,8 +103,11 @@ public class MainActivity extends AppCompatActivity {
                 bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
                 if (bluetoothLeScanner != null) {
                     scanHandler.postDelayed(() -> {
-                        stopScan();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            stopScan();
+                        }
                         Toast.makeText(this, "Scanning stopped", Toast.LENGTH_SHORT).show();
+                        updateScannedDevices();
                     }, SCAN_PERIOD);
                     isScanning = true;
                     bluetoothLeScanner.startScan(scanCallback);
@@ -108,17 +118,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Method to stop scanning for nearby BLE devices
+    @RequiresApi(api = Build.VERSION_CODES.S)
     private void stopScan() {
         if (isScanning && bluetoothLeScanner != null) {
             isScanning = false;
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, BLUETOOTH_PERMISSION_REQUEST_CODE);
+                return;
+            }
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, BLUETOOTH_PERMISSION_REQUEST_CODE);
                 return;
             }
             bluetoothLeScanner.stopScan(scanCallback);
@@ -131,8 +140,20 @@ public class MainActivity extends AppCompatActivity {
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
             BluetoothDevice device = result.getDevice();
-            // Process scanned device
-            // For example, you can display device information or add it to a list
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            if (device != null && device.getName() != null) { // Check for null device or null name
+                scannedDevices.add(device.getName() + " - " + device.getAddress());
+                updateScannedDevices(); // Update the UI with the new device
+            }
         }
 
         @Override
@@ -148,6 +169,17 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Scan failed with error code: " + errorCode, Toast.LENGTH_SHORT).show();
         }
     };
+
+
+    // Update TextView to display the scanned devices
+    private void updateScannedDevices() {
+        StringBuilder devicesStringBuilder = new StringBuilder();
+        for (String device : scannedDevices) {
+            devicesStringBuilder.append(device).append("\n");
+        }
+        tvScannedDevics.setText(devicesStringBuilder.toString());
+    }
+
 
 
     @Override

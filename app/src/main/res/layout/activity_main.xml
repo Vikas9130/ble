@@ -21,16 +21,17 @@
         android:text="Turn Off"
         android:layout_margin="16dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:layout_marginTop="16dp"/>
+
     <Button
         android:id="@+id/btnScanBluetooth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Scan"
         android:layout_margin="16dp"/>
-
+    <TextView
+        android:id="@+id/tvScannedDevics"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        android:layout_marginTop="16dp"/>
 </LinearLayout>
