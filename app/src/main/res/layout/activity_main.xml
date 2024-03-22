@@ -3,35 +3,50 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btnTurnOnBluetooth"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Turn On"
-        android:layout_margin="16dp"/>
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/btnTurnOffBluetooth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Turn Off"
-        android:layout_margin="16dp"/>
+        <Button
+            android:id="@+id/btnTurnOnBluetooth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Turn On" />
+
+        <Button
+            android:id="@+id/btnTurnOffBluetooth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Turn Off" />
 
 
-    <Button
-        android:id="@+id/btnScanBluetooth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Scan"
-        android:layout_margin="16dp"/>
-    <TextView
-        android:id="@+id/tvScannedDevics"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:layout_marginTop="16dp"/>
+        <Button
+            android:id="@+id/btnScanBluetooth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Scan" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvScannedDevics"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Hello World!" />
+    </LinearLayout>
+
+
 </LinearLayout>
